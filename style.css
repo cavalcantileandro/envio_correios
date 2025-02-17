@@ -1,0 +1,145 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 20px;
+}
+
+.btn-cadastrar {
+    display: inline-block;
+    margin-bottom: 10px;
+    background: #28a745;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-voltar {
+    display: inline-block;
+    margin-bottom: 10px;
+    background: #dc3545;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-editar {
+    background: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.btn-copiar {
+    background: #007bff; /* Azul */
+    color: #fff;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none; /* Remover borda padrão do botão */
+    cursor: pointer;
+    font-size: 14px; /* Garantir o mesmo tamanho de fonte */
+    margin-left: 5px; /* Espaçamento entre os botões */
+}
+
+.btn-copiar:hover {
+    background: #0056b3; /* Azul mais escuro */
+}
+
+.btn-status {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-status:hover {
+    background-color: #218838;
+}
+
+.filtros {
+    margin-bottom: 15px;
+}
+
+.filtros input {
+    padding: 8px;
+    margin-right: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 180px;
+}
+
+/* Estilização da tabela */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd; /* Borda externa da tabela */
+}
+
+.styled-table th, .styled-table td {
+    padding: 12px;
+    border: 1px solid #ddd; /* Linhas de divisão entre as células */
+    text-align: left; /* Alinhando todo o conteúdo à esquerda */
+}
+
+.styled-table thead {
+    background: #007bff;
+    color: #fff;
+}
+
+.styled-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+.form-cadastro {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 320px;
+    margin: 50px auto; /* Centraliza o formulário na tela */
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+}
+
+.form-cadastro label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-cadastro input, 
+.form-cadastro select, 
+.form-cadastro textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box; /* Evita que o padding quebre o layout */
+}
+
+.form-cadastro button {
+    background: #28a745;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.form-cadastro button:hover {
+    background: #218838;
+}
