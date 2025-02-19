@@ -4,15 +4,21 @@ body {
     margin: 20px;
 }
 
-.btn-cadastrar {
+.btn-cadastrar, #btn-limpar {
     display: inline-block;
-    margin-bottom: 10px;
-    background: #28a745;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
     text-decoration: none;
-    font-weight: bold;
+    font-size: 16px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: none; /* Remove a borda padrão do botão */
+    cursor: pointer; /* Adiciona o cursor de ponteiro */
+}
+
+.btn-cadastrar:hover, #btn-limpar:hover {
+    background-color: #0056b3;
 }
 
 .btn-voltar {
@@ -142,4 +148,44 @@ body {
 
 .form-cadastro button:hover {
     background: #218838;
+}
+
+.feedback-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px; /* Espaçamento entre os botões */
+    border: none; /* Remove qualquer borda */
+    background: transparent; /* Remove qualquer fundo inesperado */
+    padding: 0; /* Evita espaçamento extra */
+}
+
+.feedback-container label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 0; /* Remove qualquer espaço extra */
+    border: none; /* Remove bordas */
+    background: none; /* Garante que não tenha fundo */
+}
+
+.feedback-container input[type="radio"] {
+    display: none; /* Esconde o botão de rádio */
+}
+
+.feedback-container img {
+    width: 32px;
+    height: 32px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Quando o item for selecionado */
+.feedback-container input[type="radio"]:checked + img {
+    transform: scale(1.4); /* Destaca a opção */
+    filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.4)); /* Sombra mais intensa */
+    border-radius: 50%;
+    border: 3px solid #007bff; /* Contorno azul vibrante */
+    padding: 4px;
+    background-color: rgba(0, 123, 255, 0.2); /* Fundo levemente azul */
 }

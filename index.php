@@ -2,7 +2,7 @@
 include 'conexao.php';
 
 // Definição de paginação
-$itens_por_pagina = 10;
+$itens_por_pagina = 100;
 $pagina_atual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 $offset = ($pagina_atual - 1) * $itens_por_pagina;
 
@@ -16,6 +16,7 @@ $total_paginas = ceil($total_produtos / $itens_por_pagina);
 $sql = "SELECT * FROM envios ORDER BY data_envio DESC LIMIT $itens_por_pagina OFFSET $offset";
 $result = $conn->query($sql);
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -24,151 +25,254 @@ $result = $conn->query($sql);
     <title>Lista de Envios</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Estilo para os botões de paginação */
-        .paginacao {
-            margin-top: 20px;
-            text-align: center;
+        .acoes {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
         }
-        .paginacao a {
+        .acoes button, .acoes a {
+            padding: 5px 10px;
+            font-size: 14px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .btn-editar {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .btn-copiar {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .btn-status {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-cadastrar, #btn-limpar {
             display: inline-block;
-            padding: 10px 15px;
-            margin: 0 5px;
             background-color: #007bff;
             color: white;
+            padding: 10px 15px;
             text-decoration: none;
+            font-size: 16px;
             border-radius: 5px;
+            margin-bottom: 10px;
+			border: none; /* Remove a borda padrão do botão */
+            cursor: pointer; /* Adiciona o cursor de ponteiro */
         }
-        .paginacao a:hover {
+        .btn-cadastrar:hover, #btn-limpar :hover {
             background-color: #0056b3;
         }
-        .paginacao a:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+        .search-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
         }
-        .total-envios {
-            margin-top: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
+        .search-box input {
+            padding: 5px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 180px;
         }
     </style>
-    <script>
-        function atualizarStatus(button, id, codigoRastreio) {
-            button.textContent = "...";
-            button.disabled = true;
-
-            fetch(`atualizar_status.php?id=${id}&codigo_rastreio=${codigoRastreio}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        let linha = button.closest('tr');
-                        linha.querySelector("[data-campo='status']").textContent = data.status;
-                        button.textContent = "S";
-                        button.disabled = false;
-                    } else {
-                        alert("Erro ao atualizar o status.");
-                        button.textContent = "S";
-                        button.disabled = false;
-                    }
-                })
-                .catch(error => {
-                    console.error("Erro na requisição: ", error);
-                    alert("Erro ao atualizar o status.");
-                    button.textContent = "S";
-                    button.disabled = false;
-                });
-        }
-        
-        function filtrarTabela() {
-            let inputs = document.querySelectorAll(".filtro");
-            let linhas = document.querySelectorAll("tbody tr");
-            
-            linhas.forEach(linha => {
-                let mostrar = true;
-                inputs.forEach(input => {
-                    let valor = input.value.toLowerCase();
-                    let coluna = linha.querySelector(`[data-campo='${input.dataset.campo}']`);
-                    if (coluna && !coluna.textContent.toLowerCase().includes(valor)) {
-                        mostrar = false;
-                    }
-                });
-                linha.style.display = mostrar ? "" : "none";
-            });
-        }
-    </script>
 </head>
 <body>
-    <a href="cadastro.php" class="btn-cadastrar">+ Cadastrar</a>
-    
-    <div class="filtros">
-        <input type="text" class="filtro" data-campo="tipo" placeholder="Filtrar por Tipo" onkeyup="filtrarTabela()">
-        <input type="text" class="filtro" data-campo="modalidade" placeholder="Filtrar por Modalidade" onkeyup="filtrarTabela()">
-        <input type="text" class="filtro" data-campo="codigo_rastreio" placeholder="Filtrar por Código de Rastreio" onkeyup="filtrarTabela()">
-        <input type="text" class="filtro" data-campo="nome" placeholder="Filtrar por Nome" onkeyup="filtrarTabela()">
-        <input type="text" class="filtro" data-campo="telefone" placeholder="Filtrar por Telefone" onkeyup="filtrarTabela()">
-        <input type="text" class="filtro" data-campo="estado" placeholder="Filtrar por Estado" onkeyup="filtrarTabela()">
-        <input type="text" class="filtro" data-campo="pais" placeholder="Filtrar por País" onkeyup="filtrarTabela()">
-        <input type="text" class="filtro" data-campo="peso" placeholder="Filtrar por Peso" onkeyup="filtrarTabela()">
-        <input type="text" class="filtro" data-campo="valor" placeholder="Filtrar por Valor" onkeyup="filtrarTabela()">
-        <input type="text" class="filtro" data-campo="observacao" placeholder="Filtrar por Observação" onkeyup="filtrarTabela()">
-        <input type="text" class="filtro" data-campo="status" placeholder="Filtrar por Status" onkeyup="filtrarTabela()">
-    </div>
-    
-    <div class="total-envios">
-        Total de Envios: <?= $total_produtos ?>
-    </div>
-    
-    <table class="styled-table">
-        <thead>
+
+<a href="cadastrar.php" class="btn-cadastrar">Cadastrar Novo Envio</a>
+<p>Total de envios cadastrados: <strong><?= $total_produtos ?></strong></p>
+
+<!-- Campos de busca -->
+<div class="search-box">
+    <input type="text" id="search-tipo" placeholder="Buscar por Tipo">
+    <input type="text" id="search-modalidade" placeholder="Buscar por Modalidade">
+    <input type="text" id="search-codigo" placeholder="Buscar por Código de Rastreio">
+    <input type="text" id="search-nome" placeholder="Buscar por Nome">
+    <input type="text" id="search-telefone" placeholder="Buscar por Telefone">
+	<input type="text" id="search-data_envio" placeholder="Buscar Data">
+    <input type="text" id="search-estado" placeholder="Buscar por Estado">
+    <input type="text" id="search-pais" placeholder="Buscar por País">
+    <input type="text" id="search-peso" placeholder="Buscar por Peso">
+    <input type="text" id="search-valor" placeholder="Buscar por Valor">
+    <input type="text" id="search-status" placeholder="Buscar por Status">
+	
+	<!-- Botão limpar -->
+    <button id="btn-limpar">Limpar Filtros</button>
+	
+</div>
+
+<table class="styled-table">
+    <thead>
+        <tr>
+            <th>Tipo</th>
+            <th>Modalidade</th>
+            <th>Código de Rastreio</th>
+            <th>Nome</th>
+            <th>Telefone</th>
+            <th>Data de Envio</th>
+            <th>Estado</th>
+            <th>País</th>
+            <th>Peso (kg)</th>
+            <th>Valor (R$)</th>
+            <th>Observação</th>
+            <th>Status</th>
+            <th>Feedback</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody id="tabela-envios">
+        <?php while ($row = $result->fetch_assoc()) { ?>
             <tr>
-                <th>Tipo</th>
-                <th>Modalidade</th>
-                <th>Código de Rastreio</th>
-                <th>Nome</th>
-                <th>Telefone</th>
-                <th>Data de Envio</th>
-                <th>Estado</th>
-                <th>País</th>
-                <th>Peso (kg)</th>
-                <th>Valor (R$)</th>
-                <th>Observação</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $result->fetch_assoc()) { ?>
-                <tr>
-                    <td data-campo='tipo'><?= $row['tipo'] ?></td>
-                    <td data-campo='modalidade'><?= $row['modalidade'] ?></td>
-                    <td data-campo='codigo_rastreio'><?= $row['codigo_rastreio'] ?></td>
-                    <td data-campo='nome'><?= $row['nome'] ?></td>
-                    <td data-campo='telefone'><?= preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $row['telefone']) ?></td>
-                    <td><?= date('d/m/Y', strtotime($row['data_envio'])) ?></td>
-                    <td data-campo='estado'><?= $row['estado'] ?></td>
-                    <td data-campo='pais'><?= $row['pais'] ?></td>
-                    <td data-campo='peso'><?= $row['peso'] ?></td>
-                    <td data-campo='valor'><?= $row['valor'] ?></td>
-                    <td data-campo='observacao'><?= $row['observacao'] ?></td>
-                    <td data-campo='status'><?= $row['status'] ?></td>
-                    <td>
+                <td><?= $row['tipo'] ?></td>
+                <td><?= $row['modalidade'] ?></td>
+                <td><?= $row['codigo_rastreio'] ?></td>
+                <td><?= $row['nome'] ?></td>
+                <td><?= preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $row['telefone']) ?></td>
+                <td><?= date('d/m/Y', strtotime($row['data_envio'])) ?></td>
+                <td><?= $row['estado'] ?></td>
+                <td><?= $row['pais'] ?></td>
+                <td><?= $row['peso'] ?></td>
+                <td><?= $row['valor'] ?></td>
+                <td><?= $row['observacao'] ?></td>
+                <td><?= $row['status'] ?></td>
+                <td>
+                    <div class="feedback-container">
+                        <label>
+                            <input type="radio" name="feedback_<?= $row['id'] ?>" value="positivo" <?= $row['feedback'] == 'positivo' ? 'checked' : '' ?>>
+                            <img src="images/positivo.png" alt="Positivo">
+                        </label>
+                        <label>
+                            <input type="radio" name="feedback_<?= $row['id'] ?>" value="neutro" <?= $row['feedback'] == 'neutro' ? 'checked' : '' ?>>
+                            <img src="images/neutro.png" alt="Neutro">
+                        </label>
+                        <label>
+                            <input type="radio" name="feedback_<?= $row['id'] ?>" value="negativo" <?= $row['feedback'] == 'negativo' ? 'checked' : '' ?>>
+                            <img src="images/negativo.png" alt="Negativo">
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="acoes">
                         <a href='editar.php?id=<?= $row['id'] ?>' class='btn-editar'>E</a>
                         <button onclick='copiarDados(this)' class='btn-copiar'>C</button>
                         <button onclick='atualizarStatus(this, <?= $row['id'] ?>, "<?= $row['codigo_rastreio'] ?>")' class='btn-status'>S</button>
-                    </td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-    
-    <div class="paginacao">
-        <?php if ($pagina_atual > 1) { ?>
-            <a href="?pagina=<?= $pagina_atual - 1 ?>" class="btn-voltar">Voltar Página</a>
+                    </div>
+                </td>
+            </tr>
         <?php } ?>
-        
-        <?php if ($pagina_atual < $total_paginas) { ?>
-            <a href="?pagina=<?= $pagina_atual + 1 ?>" class="btn-proxima">Próxima Página</a>
-        <?php } ?>
-    </div>
+    </tbody>
+</table>
+
+<script>
+
+	// Evento para os botoes feedback 
+	document.querySelectorAll('.feedback-container input[type="radio"]').forEach(input => {
+		input.addEventListener('change', function() {
+			let id = this.name.split('_')[1]; // Obtém o ID do registro
+			let feedback = this.value;
+
+			fetch('atualizar_feedback.php', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: `id=${encodeURIComponent(id)}&feedback=${encodeURIComponent(feedback)}`
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (!data.success) {
+					alert('Erro ao atualizar feedback.');
+					console.error(data.error);
+				}
+			})
+			.catch(error => console.error('Erro:', error));
+		});
+	});
+
+	//Função para copiar os dados do botao copiar 
+	function copiarDados(botao) {
+        let linha = botao.closest("tr");
+        let modalidade = linha.cells[1].textContent.trim();
+        let nome = linha.cells[3].textContent.trim();
+        let codigo = linha.cells[2].textContent.trim();
+		let status = linha.cells[11].textContent.trim();
+        let link = `https://linketrack.com/track?codigo=${codigo}`;
+
+        let texto = `${modalidade}\n${nome}\n${codigo}\n${status}\n${link}`;
+
+        navigator.clipboard.writeText(texto).then(() => {
+            alert('Dados copiados para a área de transferência.');
+        }).catch(err => {
+            console.error('Erro ao copiar: ', err);
+        });
+    }
+
+	//Função para atualizar o status com efeito de processamento
+    function atualizarStatus(botao, id, codigo) {
+    // Exibe "..." no botão enquanto o status está sendo processado
+		botao.textContent = "...";
+		botao.disabled = true; // Desabilita o botão para evitar múltiplos cliques
+
+		fetch('atualizar_status.php', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: `id=${id}&codigo_rastreio=${codigo}`
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.success) {
+				let linha = botao.closest("tr");
+				let colunaStatus = linha.cells[11]; // Ajustar caso a ordem mude
+				colunaStatus.textContent = data.novo_status;
+			} else {
+				alert('Erro ao atualizar status: ' + (data.error || 'Erro desconhecido.'));
+			}
+		})
+		.catch(error => {
+			console.error('Erro:', error);
+			alert('Erro ao atualizar status.');
+		})
+		.finally(() => {
+			// Restaura o texto original do botão e o reabilita
+			botao.textContent = "S";
+			botao.disabled = false;
+		});
+	}
+
+
+    // Adiciona evento para filtrar dinamicamente
+    document.querySelectorAll('.search-box input').forEach(input => {
+        input.addEventListener('keyup', function() {
+            let termoBusca = this.value.trim().toLowerCase();
+            let colunaIndex = obterIndiceColuna(this.id.replace("search-", ""));
+
+            document.querySelectorAll("#tabela-envios tr").forEach(linha => {
+                let colunaTexto = linha.cells[colunaIndex]?.textContent.trim().toLowerCase() || '';
+                linha.style.display = colunaTexto.includes(termoBusca) ? "" : "none";
+            });
+        });
+    });
+
+    // Evento para limpar filtros
+    document.getElementById("btn-limpar").addEventListener("click", function() {
+        document.querySelectorAll('.search-box input').forEach(input => {
+            input.value = ""; // Limpa os campos de pesquisa
+        });
+
+        document.querySelectorAll("#tabela-envios tr").forEach(linha => {
+            linha.style.display = ""; // Exibe todas as linhas novamente
+        });
+    });
+
+    // Mapeia os índices das colunas para os campos de busca
+    function obterIndiceColuna(coluna) {
+        let colunas = ["tipo", "modalidade", "codigo_rastreio", "nome", "telefone", "data_envio", "estado", "pais", "peso", "valor", "observacao", "status"];
+        return colunas.indexOf(coluna); 
+    }
+</script>
+
+
+
 </body>
 </html>
