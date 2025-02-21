@@ -82,7 +82,7 @@ $result = $conn->query($sql);
 </head>
 <body>
 
-<a href="cadastrar.php" class="btn-cadastrar">Cadastrar Novo Envio</a>
+<a href="cadastro.php" class="btn-cadastrar">Cadastrar Novo Envio</a>
 <p>Total de envios cadastrados: <strong><?= $total_produtos ?></strong></p>
 
 <!-- Campos de busca -->
@@ -243,36 +243,43 @@ $result = $conn->query($sql);
 
     // Adiciona evento para filtrar dinamicamente
     document.querySelectorAll('.search-box input').forEach(input => {
-        input.addEventListener('keyup', function() {
-            let termoBusca = this.value.trim().toLowerCase();
-            let colunaIndex = obterIndiceColuna(this.id.replace("search-", ""));
+		input.addEventListener('input', function () {
+			let termoBusca = this.value.trim().toLowerCase();
+			let colunaIndex = obterIndiceColuna(this.id.replace("search-", ""));
 
-            document.querySelectorAll("#tabela-envios tr").forEach(linha => {
-                let colunaTexto = linha.cells[colunaIndex]?.textContent.trim().toLowerCase() || '';
-                linha.style.display = colunaTexto.includes(termoBusca) ? "" : "none";
-            });
-        });
-    });
+			document.querySelectorAll("#tabela-envios tr").forEach(linha => {
+				let coluna = linha.cells[colunaIndex];
 
-    // Evento para limpar filtros
-    document.getElementById("btn-limpar").addEventListener("click", function() {
-        document.querySelectorAll('.search-box input').forEach(input => {
-            input.value = ""; // Limpa os campos de pesquisa
-        });
+				if (coluna) {
+					// Se houver um <a> dentro da célula, pega o texto dele
+					let colunaTexto = coluna.querySelector('a') ? coluna.querySelector('a').textContent.trim() : coluna.textContent.trim();
 
-        document.querySelectorAll("#tabela-envios tr").forEach(linha => {
-            linha.style.display = ""; // Exibe todas as linhas novamente
-        });
-    });
+					// Normaliza para evitar problemas com acentos e caracteres invisíveis
+					colunaTexto = colunaTexto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+					termoBusca = termoBusca.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+					// Exibe ou oculta a linha com base na busca
+					linha.style.display = colunaTexto.includes(termoBusca) ? "" : "none";
+				}
+			});
+		});
+	});
+
+    // Botão para limpar filtros e exibir todas as linhas novamente
+	document.getElementById("btn-limpar").addEventListener("click", function () {
+		document.querySelectorAll('.search-box input').forEach(input => input.value = "");
+		document.querySelectorAll("#tabela-envios tr").forEach(linha => linha.style.display = "");
+	});
 
     // Mapeia os índices das colunas para os campos de busca
     function obterIndiceColuna(coluna) {
-        let colunas = ["tipo", "modalidade", "codigo_rastreio", "nome", "telefone", "data_envio", "estado", "pais", "peso", "valor", "observacao", "status"];
-        return colunas.indexOf(coluna); 
-    }
+		let colunas = [
+			"tipo", "modalidade", "codigo_rastreio", "nome", "telefone",
+			"data_envio", "estado", "pais", "peso", "valor", "observacao", "status"
+		];
+		return colunas.indexOf(coluna);
+	}
 </script>
-
-
 
 </body>
 </html>
